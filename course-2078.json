@@ -2,8 +2,8 @@
   "schema": 1,
   "courseId": 2078,
   "repository": "LearningOS/2026a-arceos-fafacao86",
-  "commit": "1e2d09efb32fd1a643a720dbedbed2ae187ba437",
-  "score": 100,
+  "commit": "929ad735433ae8e8db9ee68613e9abf8ffd9002b",
+  "score": 200,
   "totalScore": 600,
   "exercises": [
     {
@@ -16,8 +16,8 @@
     {
       "name": "ramfs_rename",
       "max": 100,
-      "score": 0,
-      "status": "fail",
+      "score": 100,
+      "status": "pass",
       "exitCode": 0
     },
     {
@@ -50,9 +50,9 @@
     }
   ],
   "student": "fafacao86",
-  "runId": "43820976785",
+  "runId": "43821802511",
   "runAttempt": "1",
   "upload": {
-    "status": "accepted"
+    "status": "pending"
   }
 }
