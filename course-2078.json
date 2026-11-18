@@ -2,8 +2,8 @@
   "schema": 1,
   "courseId": 2078,
   "repository": "LearningOS/2026a-arceos-fafacao86",
-  "commit": "929ad735433ae8e8db9ee68613e9abf8ffd9002b",
-  "score": 200,
+  "commit": "3a2801ad9e56ce90ad224e85d90dac001c3d404f",
+  "score": 300,
   "totalScore": 600,
   "exercises": [
     {
@@ -23,8 +23,8 @@
     {
       "name": "alt_alloc",
       "max": 100,
-      "score": 0,
-      "status": "fail",
+      "score": 100,
+      "status": "pass",
       "exitCode": 0
     },
     {
@@ -50,9 +50,9 @@
     }
   ],
   "student": "fafacao86",
-  "runId": "43821802511",
+  "runId": "44293202990",
   "runAttempt": "1",
   "upload": {
-    "status": "accepted"
+    "status": "pending"
   }
 }
