@@ -2,8 +2,8 @@
   "schema": 1,
   "courseId": 2078,
   "repository": "LearningOS/2026a-arceos-fafacao86",
-  "commit": "010a6dccb106f50b0d0f13d657f2b24e17fee5f8",
-  "score": 400,
+  "commit": "fe44244f3704356e152d5b9197472a63493ddecb",
+  "score": 500,
   "totalScore": 600,
   "exercises": [
     {
@@ -37,8 +37,8 @@
     {
       "name": "sys_map",
       "max": 100,
-      "score": 0,
-      "status": "fail",
+      "score": 100,
+      "status": "pass",
       "exitCode": 0
     },
     {
@@ -50,9 +50,9 @@
     }
   ],
   "student": "fafacao86",
-  "runId": "44444806272",
+  "runId": "45037255117",
   "runAttempt": "1",
   "upload": {
-    "status": "accepted"
+    "status": "pending"
   }
 }
