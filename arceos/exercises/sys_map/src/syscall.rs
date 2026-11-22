@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use core::ffi::{c_void, c_char, c_int};
+use alloc::vec;
 use axhal::arch::TrapFrame;
 use axhal::trap::{register_trap_handler, SYSCALL};
 use axerrno::LinuxError;
@@ -8,6 +9,7 @@ use axtask::current;
 use axtask::TaskExtRef;
 use axhal::paging::MappingFlags;
 use arceos_posix_api as api;
+use memory_addr::{MemoryAddr, VirtAddr, VirtAddrRange, PAGE_SIZE_4K};
 
 const SYS_IOCTL: usize = 29;
 const SYS_OPENAT: usize = 56;
@@ -21,6 +23,8 @@ const SYS_SET_TID_ADDRESS: usize = 96;
 const SYS_MMAP: usize = 222;
 
 const AT_FDCWD: i32 = -100;
+/// Preferred starting point when the caller passes `addr = NULL` to mmap.
+const MMAP_HINT: usize = 0x1000_0000;
 
 /// Macro to generate syscall body
 ///
@@ -131,16 +135,79 @@ fn handle_syscall(tf: &TrapFrame, syscall_num: usize) -> isize {
     ret
 }
 
-#[allow(unused_variables)]
 fn sys_mmap(
     addr: *mut usize,
     length: usize,
     prot: i32,
     flags: i32,
     fd: i32,
-    _offset: isize,
+    offset: isize,
 ) -> isize {
-    unimplemented!("no sys_mmap!");
+    syscall_body!(sys_mmap, {
+        if length == 0 || offset < 0 || offset as usize % PAGE_SIZE_4K != 0 {
+            return Err(LinuxError::EINVAL);
+        }
+
+        let prot = MmapProt::from_bits(prot).ok_or(LinuxError::EINVAL)?;
+        let flags = MmapFlags::from_bits(flags).ok_or(LinuxError::EINVAL)?;
+
+        let private = flags.contains(MmapFlags::MAP_PRIVATE);
+        let shared = flags.contains(MmapFlags::MAP_SHARED);
+        if private == shared || flags.contains(MmapFlags::MAP_FIXED) {
+            return Err(LinuxError::ENOSYS);
+        }
+
+        let map_size = length
+            .checked_add(PAGE_SIZE_4K - 1)
+            .map(|size| size & !(PAGE_SIZE_4K - 1))
+            .ok_or(LinuxError::EINVAL)?;
+
+        let mut data = vec![0u8; map_size];
+
+        if !flags.contains(MmapFlags::MAP_ANONYMOUS) {
+            if fd < 0 {
+                return Err(LinuxError::EBADF);
+            }
+            if api::sys_lseek(fd, offset as _, 0) < 0 {
+                return Err(LinuxError::EINVAL);
+            }
+
+            let mut read = 0;
+            while read < map_size {
+                let n = api::sys_read(
+                    fd,
+                    data[read..].as_mut_ptr() as _,
+                    map_size - read,
+                );
+                if n < 0 {
+                    return Err(LinuxError::EIO);
+                }
+                if n == 0 {
+                    break;
+                }
+                read += n as usize;
+            }
+        }
+
+        let aspace = current().task_ext().aspace.clone();
+        let mut space = aspace.lock();
+        let search_limit = VirtAddrRange::from_start_size(space.base(), space.size());
+
+        let hint = if addr.is_null() {
+            VirtAddr::from_usize(MMAP_HINT)
+        } else {
+            VirtAddr::from_usize(addr as usize).align_up_4k()
+        };
+
+        let vaddr = space
+            .find_free_area(hint, map_size, search_limit)
+            .ok_or(LinuxError::ENOMEM)?;
+
+        space.map_alloc(vaddr, map_size, prot.into(), true)?;
+        space.write(vaddr, &data)?;
+
+        Ok(vaddr.as_usize() as isize)
+    })
 }
 
 fn sys_openat(dfd: c_int, fname: *const c_char, flags: c_int, mode: api::ctypes::mode_t) -> isize {
