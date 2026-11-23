@@ -2,8 +2,8 @@
   "schema": 1,
   "courseId": 2078,
   "repository": "LearningOS/2026a-arceos-fafacao86",
-  "commit": "fe44244f3704356e152d5b9197472a63493ddecb",
-  "score": 500,
+  "commit": "2b09ac1ad5995cbcc7fe98e2f1c6c122c70be698",
+  "score": 600,
   "totalScore": 600,
   "exercises": [
     {
@@ -44,15 +44,15 @@
     {
       "name": "simple_hv",
       "max": 100,
-      "score": 0,
-      "status": "fail",
+      "score": 100,
+      "status": "pass",
       "exitCode": 0
     }
   ],
   "student": "fafacao86",
-  "runId": "45037255117",
+  "runId": "45106293959",
   "runAttempt": "1",
   "upload": {
-    "status": "accepted"
+    "status": "pending"
   }
 }
